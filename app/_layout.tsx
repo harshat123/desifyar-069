@@ -1,6 +1,4 @@
 import { TRPCProvider } from '@/lib/trpc';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
@@ -14,25 +12,16 @@ export {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+  // We're removing the font loading since the font file doesn't exist
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
+    // Hide splash screen after a short delay
+    const hideSplash = async () => {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await SplashScreen.hideAsync();
+    };
+    
+    hideSplash();
+  }, []);
 
   return <RootLayoutNav />;
 }
