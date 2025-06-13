@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, FlatList, ScrollView, Text, Animated, Platform, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, FlatList, ScrollView, Text, Animated, Platform, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -16,6 +16,7 @@ import TrendingFlyerCard from '@/components/TrendingFlyerCard';
 import * as Haptics from 'expo-haptics';
 import { Compass, MessageCircle } from 'lucide-react-native';
 
+const { width } = Dimensions.get('window');
 const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
 
 export default function DiscoverScreen() {
@@ -61,7 +62,7 @@ export default function DiscoverScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     // In a real app, this would navigate to a messaging screen
-    alert("Messaging feature coming soon!");
+    router.push('/redeem-coupon'); // Temporary navigation to an existing screen
   };
   
   // Animation values
@@ -85,7 +86,7 @@ export default function DiscoverScreen() {
       case 'restaurants':
         return 'Restaurants';
       case 'events':
-        return 'Cultural Events';
+        return 'Events';
       case 'markets':
         return 'Bazaars';
       case 'sports':
@@ -96,8 +97,12 @@ export default function DiscoverScreen() {
   };
   
   // Render a grid item for flyers
-  const renderFlyerItem = ({ item, index }: { item: Flyer, index: number }) => (
-    <View style={styles.flyerGridItem}>
+  const renderFlyerItem = ({ item }: { item: Flyer }) => (
+    <View style={[
+      styles.flyerGridItem,
+      // For 3 items per row on larger screens
+      width > 768 && { width: '32%' }
+    ]}>
       <FlyerCard flyer={item} onPress={handleFlyerPress} />
     </View>
   );
@@ -136,7 +141,7 @@ export default function DiscoverScreen() {
           data={flyers}
           keyExtractor={(item) => item.id}
           renderItem={renderFlyerItem}
-          numColumns={2}
+          numColumns={width > 768 ? 3 : 2}
           columnWrapperStyle={styles.flyerGridRow}
           contentContainerStyle={styles.flyersContainer}
           showsVerticalScrollIndicator={false}
@@ -150,16 +155,20 @@ export default function DiscoverScreen() {
               {trendingFlyers.length > 0 && !selectedCategory && (
                 <View style={styles.trendingSection}>
                   <Text style={styles.trendingSectionTitle}>Trending Now</Text>
-                  <View style={styles.trendingGrid}>
-                    {trendingFlyers.slice(0, 3).map((flyer) => (
-                      <View key={flyer.id} style={styles.trendingGridItem}>
+                  <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.trendingScrollContent}
+                  >
+                    {trendingFlyers.map((flyer) => (
+                      <View key={flyer.id} style={styles.trendingItem}>
                         <TrendingFlyerCard 
                           flyer={flyer} 
                           onPress={handleFlyerPress} 
                         />
                       </View>
                     ))}
-                  </View>
+                  </ScrollView>
                 </View>
               )}
               
@@ -301,13 +310,11 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  trendingGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  trendingScrollContent: {
+    paddingLeft: 4,
+    paddingRight: 16,
   },
-  trendingGridItem: {
-    width: '32%',
-    marginBottom: 8,
+  trendingItem: {
+    marginRight: 12,
   },
 });

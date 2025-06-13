@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Modal, Platform } from 'react-native';
 import { colors } from '@/constants/colors';
 import { MapPin, Search, X } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
-import { Platform } from 'react-native';
 
 // Mock data for address suggestions - expanded to include more US cities
 const mockAddressSuggestions = [
@@ -57,6 +56,14 @@ export default function LocationAutocomplete({
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  
+  useEffect(() => {
+    // Update query when value changes from outside
+    if (value !== query) {
+      setQuery(value);
+    }
+  }, [value]);
   
   useEffect(() => {
     if (query.trim().length > 2) {
@@ -77,7 +84,12 @@ export default function LocationAutocomplete({
       );
       setSuggestions(filtered);
       setLoading(false);
-    }, 500);
+      
+      // Show suggestions if we have results
+      if (filtered.length > 0) {
+        setShowSuggestions(true);
+      }
+    }, 300);
   };
   
   const handleSelectAddress = (suggestion: AddressSuggestion) => {
@@ -88,6 +100,7 @@ export default function LocationAutocomplete({
     setQuery(suggestion.address);
     onChange(suggestion.address, suggestion.lat, suggestion.lng);
     setShowSuggestions(false);
+    setModalVisible(false);
   };
   
   const handleClearInput = () => {
@@ -97,65 +110,173 @@ export default function LocationAutocomplete({
   };
   
   const handleFocus = () => {
-    setShowSuggestions(true);
+    if (Platform.OS === 'ios' || Platform.OS === 'android') {
+      setModalVisible(true);
+    } else {
+      setShowSuggestions(true);
+    }
+    
     if (query.trim().length > 2) {
       searchAddresses(query);
     }
   };
   
+  const handleChangeText = (text: string) => {
+    setQuery(text);
+    if (text.trim().length === 0) {
+      onChange('');
+    }
+  };
+  
+  const renderSuggestionsList = () => (
+    <View style={styles.suggestionsContainer}>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="small" color={colors.primary} />
+          <Text style={styles.loadingText}>Searching addresses...</Text>
+        </View>
+      ) : suggestions.length > 0 ? (
+        <FlatList
+          data={suggestions}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.suggestionItem}
+              onPress={() => handleSelectAddress(item)}
+            >
+              <MapPin size={16} color={colors.primary} style={styles.suggestionIcon} />
+              <Text style={styles.suggestionText}>{item.address}</Text>
+            </TouchableOpacity>
+          )}
+          style={styles.suggestionsList}
+        />
+      ) : query.trim().length > 2 ? (
+        <View style={styles.noResultsContainer}>
+          <Text style={styles.noResultsText}>No addresses found</Text>
+          <Text style={styles.noResultsSubtext}>Try a different search term</Text>
+        </View>
+      ) : null}
+    </View>
+  );
+  
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       
-      <View style={styles.inputContainer}>
-        <MapPin size={20} color={colors.textSecondary} style={styles.inputIcon} />
-        
-        <TextInput
-          style={styles.input}
-          value={query}
-          onChangeText={setQuery}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textSecondary}
-          onFocus={handleFocus}
-        />
-        
-        {query.length > 0 && (
-          <TouchableOpacity onPress={handleClearInput} style={styles.clearButton}>
-            <X size={16} color={colors.textSecondary} />
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      {showSuggestions && (
-        <View style={styles.suggestionsContainer}>
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={styles.loadingText}>Searching addresses...</Text>
-            </View>
-          ) : suggestions.length > 0 ? (
-            <FlatList
-              data={suggestions}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.suggestionItem}
-                  onPress={() => handleSelectAddress(item)}
-                >
-                  <MapPin size={16} color={colors.primary} style={styles.suggestionIcon} />
-                  <Text style={styles.suggestionText}>{item.address}</Text>
-                </TouchableOpacity>
-              )}
-              style={styles.suggestionsList}
-            />
-          ) : query.trim().length > 2 ? (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>No addresses found</Text>
-              <Text style={styles.noResultsSubtext}>Try a different search term</Text>
-            </View>
-          ) : null}
+      {Platform.OS === 'web' ? (
+        <View style={styles.webInputContainer}>
+          <MapPin size={20} color={colors.textSecondary} style={styles.inputIcon} />
+          <TextInput
+            style={styles.webInput}
+            value={query}
+            onChangeText={handleChangeText}
+            placeholder={placeholder}
+            placeholderTextColor={colors.textSecondary}
+            onFocus={handleFocus}
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={handleClearInput} style={styles.clearButton}>
+              <X size={16} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
         </View>
+      ) : (
+        <TouchableOpacity 
+          style={styles.inputContainer}
+          onPress={handleFocus}
+          activeOpacity={0.8}
+        >
+          <MapPin size={20} color={colors.textSecondary} style={styles.inputIcon} />
+          
+          <Text style={[
+            styles.input,
+            !query && styles.placeholderText
+          ]}>
+            {query || placeholder}
+          </Text>
+          
+          {query.length > 0 && (
+            <TouchableOpacity onPress={handleClearInput} style={styles.clearButton}>
+              <X size={16} color={colors.textSecondary} />
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
       )}
+      
+      {Platform.OS === 'web' && showSuggestions && renderSuggestionsList()}
+      
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <TouchableOpacity 
+                onPress={() => setModalVisible(false)}
+                style={styles.closeButton}
+              >
+                <X size={24} color={colors.text} />
+              </TouchableOpacity>
+              <Text style={styles.modalTitle}>Search Location</Text>
+            </View>
+            
+            <View style={styles.searchContainer}>
+              <View style={styles.searchInputContainer}>
+                <Search size={20} color={colors.textSecondary} style={styles.searchIcon} />
+                <TextInput
+                  style={styles.searchInput}
+                  value={query}
+                  onChangeText={handleChangeText}
+                  placeholder="Enter address or location"
+                  placeholderTextColor={colors.textSecondary}
+                  autoFocus
+                />
+                {query.length > 0 && (
+                  <TouchableOpacity onPress={handleClearInput} style={styles.clearButton}>
+                    <X size={16} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+            
+            {loading ? (
+              <View style={styles.modalLoadingContainer}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.modalLoadingText}>Searching addresses...</Text>
+              </View>
+            ) : suggestions.length > 0 ? (
+              <FlatList
+                data={suggestions}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.modalSuggestionItem}
+                    onPress={() => handleSelectAddress(item)}
+                  >
+                    <MapPin size={20} color={colors.primary} style={styles.suggestionIcon} />
+                    <Text style={styles.modalSuggestionText}>{item.address}</Text>
+                  </TouchableOpacity>
+                )}
+                style={styles.modalSuggestionsList}
+              />
+            ) : query.trim().length > 2 ? (
+              <View style={styles.modalNoResultsContainer}>
+                <Text style={styles.modalNoResultsText}>No addresses found</Text>
+                <Text style={styles.modalNoResultsSubtext}>Try a different search term</Text>
+              </View>
+            ) : (
+              <View style={styles.modalInitialState}>
+                <Text style={styles.modalInitialText}>
+                  Start typing to search for locations
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
       
       <Text style={styles.helperText}>
         Enter your store or event location for customers to find you easily
@@ -184,6 +305,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  webInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  webInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+    padding: 4,
+  },
   inputIcon: {
     marginRight: 12,
   },
@@ -191,6 +327,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: colors.text,
+  },
+  placeholderText: {
+    color: colors.textSecondary,
   },
   clearButton: {
     padding: 4,
@@ -203,6 +342,10 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     maxHeight: 200,
     zIndex: 20,
+    position: 'absolute',
+    top: 90,
+    left: 0,
+    right: 0,
   },
   suggestionsList: {
     padding: 8,
@@ -251,5 +394,104 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 8,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: colors.background,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  closeButton: {
+    padding: 4,
+    marginRight: 12,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  searchContainer: {
+    padding: 16,
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  searchIcon: {
+    marginRight: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.text,
+  },
+  modalSuggestionsList: {
+    flex: 1,
+  },
+  modalSuggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  modalSuggestionText: {
+    fontSize: 16,
+    color: colors.text,
+  },
+  modalLoadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalLoadingText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    marginTop: 16,
+  },
+  modalNoResultsContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalNoResultsText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  modalNoResultsSubtext: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  modalInitialState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  modalInitialText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    textAlign: 'center',
   },
 });

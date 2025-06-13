@@ -12,6 +12,7 @@ import CustomImagePicker from '@/components/ImagePicker';
 import DatePicker from '@/components/DatePicker';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { mockFirebaseServices } from './firebase-config';
+import { trpcClient } from '@/lib/trpc';
 
 export default function CreateFlyerScreen() {
   const { 
@@ -159,6 +160,16 @@ export default function CreateFlyerScreen() {
       
       // Using our mock Firebase service
       await mockFirebaseServices.uploadFile('flyers', imageUri);
+      
+      // Try to use backend if available
+      try {
+        // This is a placeholder for the actual backend call
+        // In a real app, we would use trpc to create the flyer
+        const result = await trpcClient.example.hi.query();
+        console.log("Backend response:", result);
+      } catch (error) {
+        console.log("Backend not available, using mock service");
+      }
       
       await mockFirebaseServices.addDocument('flyers', {
         title,

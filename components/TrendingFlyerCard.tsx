@@ -48,11 +48,13 @@ export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardP
         <View style={styles.locationContainer}>
           <MapPin size={12} color={colors.textSecondary} />
           <Text style={styles.locationText} numberOfLines={1}>
-            {flyer.location.address ? flyer.location.address.split(',')[0] : 'Location N/A'}
+            {flyer.location.address 
+              ? flyer.location.address.split(',')[0] 
+              : 'Location N/A'}
           </Text>
         </View>
         
-        {(flyer.averageRating !== undefined && flyer.averageRating > 0) && (
+        {flyer.averageRating !== undefined && flyer.averageRating > 0 && (
           <View style={styles.ratingContainer}>
             <Star size={12} color={colors.secondary} fill={colors.secondary} />
             <Text style={styles.ratingText}>

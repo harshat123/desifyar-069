@@ -36,7 +36,7 @@ const getCategoryTitle = (category: Category): string => {
     case 'restaurants':
       return 'Restaurants';
     case 'events':
-      return 'Cultural Events';
+      return 'Events';
     case 'markets':
       return 'Bazaars';
     case 'sports':
@@ -49,15 +49,15 @@ const getCategoryTitle = (category: Category): string => {
 const getCategoryImage = (category: Category): string => {
   switch (category) {
     case 'groceries':
-      return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop';
+      return 'https://images.unsplash.com/photo-1579113800032-c38bd7635818?w=400&h=400&fit=crop';
     case 'restaurants':
       return 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=400&fit=crop';
     case 'events':
-      return 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=400&h=400&fit=crop';
+      return 'https://images.unsplash.com/photo-1496024840928-4c417adf211d?w=400&h=400&fit=crop';
     case 'markets':
       return 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop';
     case 'sports':
-      return 'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=400&h=400&fit=crop';
+      return 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&h=400&fit=crop';
     default:
       return '';
   }

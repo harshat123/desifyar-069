@@ -11,9 +11,6 @@ interface FlyerCardProps {
   onPress: (flyer: Flyer) => void;
 }
 
-const { width } = Dimensions.get('window');
-const cardWidth = width - 32;
-
 export default function FlyerCard({ flyer, onPress }: FlyerCardProps) {
   const daysLeft = Math.ceil(
     (new Date(flyer.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
@@ -119,7 +116,7 @@ export default function FlyerCard({ flyer, onPress }: FlyerCardProps) {
 
 const styles = StyleSheet.create({
   container: {
-    width: cardWidth,
+    flex: 1,
     borderRadius: 16,
     backgroundColor: colors.card,
     marginBottom: 16,
