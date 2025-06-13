@@ -11,7 +11,8 @@ interface TrendingFlyerCardProps {
 }
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width * 0.32 - 16;
+// Adjust card width to prevent overlapping
+const CARD_WIDTH = Math.min(width * 0.32, 160);
 
 export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardProps) {
   const handlePress = () => {
@@ -48,7 +49,7 @@ export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardP
         <View style={styles.locationContainer}>
           <MapPin size={12} color={colors.textSecondary} />
           <Text style={styles.locationText} numberOfLines={1}>
-            {flyer.location.address 
+            {flyer.location && flyer.location.address 
               ? flyer.location.address.split(',')[0] 
               : 'Location N/A'}
           </Text>
@@ -78,6 +79,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    marginRight: 12, // Add explicit margin to prevent overlapping
   },
   image: {
     width: '100%',

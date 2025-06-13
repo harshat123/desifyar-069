@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flyer App</title>
+  <meta name="description" content="Discover authentic Indian stores and offers">
+  <link rel="icon" href="/favicon.png">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .loading-container {
+      text-align: center;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #3498db;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      font-size: 18px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <p class="loading-text">Loading Flyer App...</p>
+    </div>
+  </div>
+</body>
+</html>

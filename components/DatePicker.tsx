@@ -418,6 +418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    zIndex: 1000,
   },
   webModalContent: {
     backgroundColor: colors.card,
@@ -429,6 +430,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+    zIndex: 1001,
   },
   webModalHeader: {
     flexDirection: 'row',

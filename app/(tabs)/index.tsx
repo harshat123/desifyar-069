@@ -14,7 +14,7 @@ import CreateFlyerButton from '@/components/CreateFlyerButton';
 import EmptyState from '@/components/EmptyState';
 import TrendingFlyerCard from '@/components/TrendingFlyerCard';
 import * as Haptics from 'expo-haptics';
-import { Compass, MessageCircle, Cricket } from 'lucide-react-native';
+import { Compass, MessageCircle } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
@@ -155,8 +155,12 @@ export default function DiscoverScreen() {
               {trendingFlyers.length > 0 && !selectedCategory && (
                 <View style={styles.trendingSection}>
                   <Text style={styles.trendingSectionTitle}>Trending Now</Text>
-                  <View style={styles.trendingGrid}>
-                    {trendingFlyers.slice(0, 3).map((flyer) => (
+                  <ScrollView 
+                    horizontal 
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.trendingScrollContent}
+                  >
+                    {trendingFlyers.slice(0, 6).map((flyer) => (
                       <View key={flyer.id} style={styles.trendingItem}>
                         <TrendingFlyerCard 
                           flyer={flyer} 
@@ -164,7 +168,7 @@ export default function DiscoverScreen() {
                         />
                       </View>
                     ))}
-                  </View>
+                  </ScrollView>
                 </View>
               )}
               
@@ -266,6 +270,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
+    paddingHorizontal: 4, // Add padding to prevent text from touching the edge
   },
   sectionTitle: {
     fontSize: 20,
@@ -308,6 +313,7 @@ const styles = StyleSheet.create({
   locationHint: {
     fontSize: 14,
     color: colors.textSecondary,
+    paddingHorizontal: 4, // Add padding to prevent text from touching the edge
   },
   flyersContainer: {
     padding: 16,
@@ -328,15 +334,14 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.text,
     marginBottom: 12,
+    paddingHorizontal: 4, // Add padding to prevent text from touching the edge
   },
-  trendingGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  trendingScrollContent: {
+    paddingLeft: 4,
+    paddingRight: 16,
   },
   trendingItem: {
-    width: '32%',
-    marginBottom: 12,
+    marginRight: 12, // This is now redundant as we added margin to the card itself
   },
   sportsHighlight: {
     marginVertical: 16,
