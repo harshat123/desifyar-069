@@ -7,7 +7,6 @@ import { colors } from '@/constants/colors';
 import { Category } from '@/types';
 import { useUserStore } from '@/store/useUserStore';
 import { Tag, AlertCircle, MessageCircle } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import CustomImagePicker from '@/components/ImagePicker';
 import DatePicker from '@/components/DatePicker';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -95,9 +94,6 @@ export default function CreateFlyerScreen() {
   const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
   
   const handleCategorySelect = (selectedCategory: Category) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
     setCategory(selectedCategory);
   };
   
@@ -117,9 +113,6 @@ export default function CreateFlyerScreen() {
   };
   
   const handleContactSupport = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     // In a real app, this would navigate to a messaging screen
     Alert.alert(
       "Contact Support",
@@ -129,10 +122,6 @@ export default function CreateFlyerScreen() {
   };
   
   const handleSubmit = async () => {
-    if (Platform.OS !== 'web') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
-    
     // Check if business name is unique or if it's the user's existing business
     const userBusinessNames = getBusinessNames();
     const isExistingBusiness = userBusinessNames.includes(businessName.toLowerCase().trim());

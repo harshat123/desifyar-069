@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, A
 import { useLocationStore } from '@/store/useLocationStore';
 import { colors } from '@/constants/colors';
 import { popularCities, states, City } from '@/constants/cities';
-import { MapPin, RefreshCw, Search, X, ChevronDown } from "lucide-react";
+import { MapPin, RefreshCw, Search, X, ChevronDown } from "lucide-react-native";
 
 export default function LocationBar() {
   const { latitude, longitude, address, setLocation } = useLocationStore();

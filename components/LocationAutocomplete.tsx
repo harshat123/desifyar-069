@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Modal, Platform } from 'react-native';
 import { colors } from '@/constants/colors';
 import { MapPin, Search, X } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 
 // Mock data for address suggestions - expanded to include more US cities
 const mockAddressSuggestions = [
@@ -117,9 +116,7 @@ export default function LocationAutocomplete({
   };
   
   const handleSelectAddress = (suggestion: AddressSuggestion) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
+    // Skip haptics on web
     
     setQuery(suggestion.address);
     onChange(suggestion.address, suggestion.lat, suggestion.lng);

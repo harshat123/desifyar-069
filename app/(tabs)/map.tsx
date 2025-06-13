@@ -9,7 +9,6 @@ import { mockFlyers } from '@/mocks/flyers';
 import { Flyer, Category } from '@/types';
 import { Image } from 'expo-image';
 import { MapPin, Tag, Filter, X, Star } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
@@ -60,39 +59,24 @@ export default function MapScreen() {
   }, [latitude, longitude, selectedCategory, sportSubcategory]);
   
   const handleMarkerPress = (flyer: Flyer) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     setSelectedFlyer(flyer);
   };
   
   const handleFlyerPress = (flyer: Flyer) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
     router.push(`/flyer/${flyer.id}`);
   };
   
   const handleCategoryPress = (category: Category) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
     setSelectedCategory(selectedCategory === category ? null : category);
     setSportSubcategory(null);
     setShowFilters(false);
   };
   
   const handleSportSubcategoryPress = (subcategory: string) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
     setSportSubcategory(sportSubcategory === subcategory ? null : subcategory);
   };
   
   const toggleFilters = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     setShowFilters(!showFilters);
   };
   

@@ -4,7 +4,6 @@ import { Image } from 'expo-image';
 import { colors } from '@/constants/colors';
 import { Upload, X, FileImage, AlertCircle } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import * as Haptics from 'expo-haptics';
 
 interface ImagePickerProps {
   imageUri: string | null;
@@ -22,10 +21,7 @@ export default function CustomImagePicker({ imageUri, onImageSelected, onImageRe
   } | null>(null);
 
   const pickImage = async () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
+    // Skip haptics on web
     setError(null);
     
     try {
@@ -77,10 +73,7 @@ export default function CustomImagePicker({ imageUri, onImageSelected, onImageRe
   };
   
   const handleRemoveImage = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-    
+    // Skip haptics on web
     setImageInfo(null);
     setError(null);
     onImageRemoved();

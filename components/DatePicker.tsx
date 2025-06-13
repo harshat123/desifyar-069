@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Platform, Modal } from 'react-native';
 import { colors } from '@/constants/colors';
 import { Calendar, X, ChevronLeft, ChevronRight } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface DatePickerProps {
@@ -33,9 +32,7 @@ export default function DatePicker({
   const minDate = new Date();
   
   const handlePress = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
+    // Skip haptics on web
     
     // Set initial date to current value or today
     if (value) {
@@ -91,10 +88,6 @@ export default function DatePicker({
     onChange(formattedDate);
     setShowPicker(false);
     setShowCalendarModal(false);
-    
-    if (Platform.OS !== 'web') {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    }
   };
   
   const formatDisplayDate = (dateString: string): string => {
