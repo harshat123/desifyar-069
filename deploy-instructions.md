@@ -1,71 +1,56 @@
-# Deployment Instructions for Flyer App
+# Firebase Deployment Instructions
+
+This document provides step-by-step instructions for deploying the Flyer App to Firebase Hosting.
 
 ## Prerequisites
-- Node.js (v16 or higher)
-- Firebase CLI (`npm install -g firebase-tools`)
-- Expo CLI (`npm install -g expo-cli`)
 
-## Step 1: Build the Web Version
+1. Make sure you have Firebase CLI installed:
+   ```
+   npm install -g firebase-tools
+   ```
 
-```bash
-# Install dependencies
-npm install
+2. Make sure you're logged in to Firebase:
+   ```
+   firebase login
+   ```
 
-# Build the web version
-npm run build
-```
+3. If you haven't initialized Firebase in your project yet:
+   ```
+   firebase init
+   ```
+   - Select "Hosting" when prompted
+   - Select your Firebase project or create a new one
+   - Use "web-build" as your public directory
+   - Configure as a single-page app: Yes
+   - Set up automatic builds and deploys with GitHub: No (unless you want to)
 
-This will create a `web-build` directory with your compiled web app.
+## Deployment Steps
 
-## Step 2: Firebase Setup
+1. Build your Expo web app:
+   ```
+   npm run build
+   ```
+   This will create a `web-build` directory with your compiled web app.
 
-If you haven't already set up Firebase:
+2. Deploy to Firebase Hosting:
+   ```
+   npm run deploy
+   ```
+   Or you can run both commands in sequence:
+   ```
+   npm run build-and-deploy
+   ```
 
-```bash
-# Login to Firebase
-firebase login
-
-# Initialize Firebase in your project (if not already done)
-firebase init
-```
-
-During initialization:
-- Select "Hosting"
-- Select your Firebase project or create a new one
-- Use "web-build" as your public directory
-- Configure as a single-page app: Yes
-- Set up automatic builds and deploys with GitHub: No (unless you want to)
-
-## Step 3: Deploy to Firebase
-
-```bash
-# Deploy to Firebase
-firebase deploy
-```
-
-After deployment, you'll receive a URL where your app is hosted.
-
-## Step 4: Verify Deployment
-
-Open the provided URL in your browser to verify that your app is working correctly.
+3. After deployment completes, Firebase will provide a URL where your app is hosted.
 
 ## Troubleshooting
 
-### Issue: Blank screen after deployment
-- Check browser console for errors
-- Verify that all paths in your app are correct
-- Make sure your Firebase configuration is correct
+- If you encounter any issues with React version compatibility, check the package.json file. The app is configured to use React 18.2.0 to be compatible with all dependencies.
 
-### Issue: Missing assets
-- Ensure all assets are properly referenced in your code
-- Check if the build process included all necessary files
+- If you see 404 errors after deployment, make sure your Firebase hosting configuration has the correct rewrite rules (they should be set up in firebase.json).
 
-### Issue: Routing issues
-- Verify that the Firebase rewrite rules in firebase.json are correct
-- Make sure your app's routing configuration works with Firebase hosting
-
-## Additional Resources
-
-- [Expo Web Documentation](https://docs.expo.dev/workflow/web/)
-- [Firebase Hosting Documentation](https://firebase.google.com/docs/hosting)
-- [React Native Web Documentation](https://necolas.github.io/react-native-web/)
+- For any other issues, check the Firebase Hosting documentation or run:
+  ```
+  firebase deploy --debug
+  ```
+  to get more detailed error information.
