@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Platform, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Stack, router } from 'expo-router';
@@ -12,7 +12,7 @@ import CustomImagePicker from '@/components/ImagePicker';
 import DatePicker from '@/components/DatePicker';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { mockFirebaseServices } from './firebase-config';
-import { trpcClient } from '@/lib/trpc';
+import { trpc, trpcClient } from '@/lib/trpc';
 
 export default function CreateFlyerScreen() {
   const { 
@@ -43,6 +43,40 @@ export default function CreateFlyerScreen() {
   const [businessNameError, setBusinessNameError] = useState('');
   const [remainingFreePostings, setRemainingFreePostings] = useState(5);
   const [showContactSupport, setShowContactSupport] = useState(false);
+  
+  // tRPC mutation for creating a flyer
+  const createFlyerMutation = trpc.flyers.create.useMutation({
+    onSuccess: (data) => {
+      console.log("Flyer created successfully:", data);
+      
+      // Add business name to user's list if it's a new business
+      const userBusinessNames = getBusinessNames();
+      const isExistingBusiness = userBusinessNames.includes(businessName.toLowerCase().trim());
+      if (!isExistingBusiness) {
+        addBusinessName(businessName);
+      }
+      
+      // Increment counters
+      incrementFlyersPosted();
+      incrementMonthlyPostingCount();
+      
+      Alert.alert(
+        "Flyer Created",
+        "Your flyer has been successfully created!",
+        [{ text: "OK", onPress: () => router.back() }]
+      );
+      
+      setIsSubmitting(false);
+    },
+    onError: (error) => {
+      console.error("Error creating flyer:", error);
+      Alert.alert(
+        "Error",
+        "Failed to create flyer. Please try again."
+      );
+      setIsSubmitting(false);
+    }
+  });
   
   useEffect(() => {
     // Reset monthly posting count if needed (new month)
@@ -117,94 +151,72 @@ export default function CreateFlyerScreen() {
     setIsSubmitting(true);
     
     try {
-      // In a real app with Firebase, we would:
-      // 1. Upload the image to Firebase Storage
-      // 2. Get the download URL
-      // 3. Save the flyer data to Firestore
-      
-      /* 
-      // Example Firebase implementation (commented out as we can't actually use Firebase here)
-      // Upload image to Firebase Storage
-      const storage = getStorage();
-      const imageRef = ref(storage, `flyers/${Date.now()}`);
-      
-      // For expo, we'd need to fetch the blob first
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      
-      await uploadBytes(imageRef, blob);
-      const downloadURL = await getDownloadURL(imageRef);
-      
-      // Save flyer data to Firestore
-      const db = getFirestore();
-      await addDoc(collection(db, "flyers"), {
-        title,
-        businessName,
-        description,
-        category,
-        imageUrl: downloadURL,
-        location: {
-          address: location,
-          latitude: locationCoords.lat,
-          longitude: locationCoords.lng,
-        },
-        createdAt: new Date().toISOString(),
-        expiresAt: expiryDate,
-        views: 0,
-        reactions: 0,
-        userId: user.id,
-        discount,
-        couponCode,
-      });
-      */
-      
-      // Using our mock Firebase service
-      await mockFirebaseServices.uploadFile('flyers', imageUri);
+      // In a real app, we would upload the image to storage first
+      // For this demo, we'll use a mock image URL
+      const imageUrl = imageUri || 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7';
       
       // Try to use backend if available
       try {
-        // This is a placeholder for the actual backend call
-        // In a real app, we would use trpc to create the flyer
-        const result = await trpcClient.example.hi.query();
-        console.log("Backend response:", result);
+        // Use tRPC mutation to create the flyer
+        createFlyerMutation.mutate({
+          title,
+          businessName,
+          description,
+          category: category || 'events', // Default to events if no category selected
+          imageUrl,
+          location: {
+            address: location,
+            latitude: locationCoords.lat,
+            longitude: locationCoords.lng,
+          },
+          expiresAt: expiryDate,
+          discount,
+          couponCode,
+        });
+        
+        // The success and error handling is in the mutation hooks
+        return;
       } catch (error) {
         console.log("Backend not available, using mock service");
+        
+        // Fallback to mock service
+        await mockFirebaseServices.uploadFile('flyers', imageUri);
+        
+        await mockFirebaseServices.addDocument('flyers', {
+          title,
+          businessName,
+          description,
+          category,
+          imageUrl: 'https://example.com/mock-flyer.jpg', // In a real app, this would be the downloadURL
+          location: {
+            address: location,
+            latitude: locationCoords.lat,
+            longitude: locationCoords.lng,
+          },
+          createdAt: new Date().toISOString(),
+          expiresAt: expiryDate,
+          views: 0,
+          reactions: 0,
+          userId: mockFirebaseServices.getCurrentUser().uid,
+          discount,
+          couponCode,
+        });
+        
+        // Add business name to user's list if it's a new business
+        if (!isExistingBusiness) {
+          addBusinessName(businessName);
+        }
+        
+        // Increment counters
+        incrementFlyersPosted();
+        incrementMonthlyPostingCount();
+        
+        Alert.alert(
+          "Flyer Created",
+          "Your flyer has been successfully created!",
+          [{ text: "OK", onPress: () => router.back() }]
+        );
       }
-      
-      await mockFirebaseServices.addDocument('flyers', {
-        title,
-        businessName,
-        description,
-        category,
-        imageUrl: 'https://example.com/mock-flyer.jpg', // In a real app, this would be the downloadURL
-        location: {
-          address: location,
-          latitude: locationCoords.lat,
-          longitude: locationCoords.lng,
-        },
-        createdAt: new Date().toISOString(),
-        expiresAt: expiryDate,
-        views: 0,
-        reactions: 0,
-        userId: mockFirebaseServices.getCurrentUser().uid,
-        discount,
-        couponCode,
-      });
-      
-      // Add business name to user's list if it's a new business
-      if (!isExistingBusiness) {
-        addBusinessName(businessName);
-      }
-      
-      // Increment counters
-      incrementFlyersPosted();
-      incrementMonthlyPostingCount();
-      
-      Alert.alert(
-        "Flyer Created",
-        "Your flyer has been successfully created!",
-        [{ text: "OK", onPress: () => router.back() }]
-      );
     } catch (error) {
       console.error("Error creating flyer:", error);
       Alert.alert(
@@ -245,9 +257,11 @@ export default function CreateFlyerScreen() {
               onPress={handleSubmit}
               disabled={!isFormValid() || isSubmitting}
             >
-              <Text style={styles.submitButtonText}>
-                {isSubmitting ? 'Posting...' : 'Post'}
-              </Text>
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.submitButtonText}>Post</Text>
+              )}
             </TouchableOpacity>
           ),
         }}
@@ -435,6 +449,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     marginRight: 8,
+    minWidth: 80,
+    alignItems: 'center',
   },
   submitButtonDisabled: {
     backgroundColor: colors.textSecondary,

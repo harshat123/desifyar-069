@@ -19,8 +19,10 @@ export default function MapScreen() {
   const [nearbyFlyers, setNearbyFlyers] = useState<Flyer[]>([]);
   const [selectedFlyer, setSelectedFlyer] = useState<Flyer | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [sportSubcategory, setSportSubcategory] = useState<string | null>(null);
   
   const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
+  const sportSubcategories = ['Cricket', 'Badminton', 'Tennis', 'Volleyball', 'Pickleball'];
   
   useEffect(() => {
     // Filter flyers based on location and category
@@ -28,6 +30,14 @@ export default function MapScreen() {
     
     if (selectedCategory) {
       filtered = filtered.filter(flyer => flyer.category === selectedCategory);
+      
+      // Further filter by sport subcategory if applicable
+      if (selectedCategory === 'sports' && sportSubcategory) {
+        filtered = filtered.filter(flyer => 
+          flyer.title.toLowerCase().includes(sportSubcategory.toLowerCase()) || 
+          flyer.description.toLowerCase().includes(sportSubcategory.toLowerCase())
+        );
+      }
     }
     
     // Calculate distance if location is available
@@ -47,7 +57,7 @@ export default function MapScreen() {
     }
     
     setNearbyFlyers(filtered);
-  }, [latitude, longitude, selectedCategory]);
+  }, [latitude, longitude, selectedCategory, sportSubcategory]);
   
   const handleMarkerPress = (flyer: Flyer) => {
     if (Platform.OS !== 'web') {
@@ -68,7 +78,15 @@ export default function MapScreen() {
       Haptics.selectionAsync();
     }
     setSelectedCategory(selectedCategory === category ? null : category);
+    setSportSubcategory(null);
     setShowFilters(false);
+  };
+  
+  const handleSportSubcategoryPress = (subcategory: string) => {
+    if (Platform.OS !== 'web') {
+      Haptics.selectionAsync();
+    }
+    setSportSubcategory(sportSubcategory === subcategory ? null : subcategory);
   };
   
   const toggleFilters = () => {
@@ -117,7 +135,7 @@ export default function MapScreen() {
       case 'markets':
         return 'Business Markets';
       case 'sports':
-        return 'Sports';
+        return sportSubcategory || 'Sports';
       default:
         return category;
     }
@@ -208,6 +226,42 @@ export default function MapScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
+          
+          {selectedCategory === 'sports' && (
+            <View style={styles.subcategoriesContainer}>
+              <Text style={styles.subcategoriesTitle}>Sports Type</Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.subcategoriesScrollContent}
+              >
+                {sportSubcategories.map((subcategory) => (
+                  <TouchableOpacity
+                    key={subcategory}
+                    style={[
+                      styles.subcategoryButton,
+                      sportSubcategory === subcategory && { 
+                        backgroundColor: `${colors.categories.sports}40` 
+                      }
+                    ]}
+                    onPress={() => handleSportSubcategoryPress(subcategory)}
+                  >
+                    <Text 
+                      style={[
+                        styles.subcategoryButtonText,
+                        sportSubcategory === subcategory && { 
+                          color: colors.categories.sports,
+                          fontWeight: '600'
+                        }
+                      ]}
+                    >
+                      {subcategory}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
         </View>
       )}
       
@@ -248,7 +302,7 @@ export default function MapScreen() {
             <Text style={styles.flyerTitle}>{selectedFlyer.title}</Text>
             <Text style={styles.flyerBusinessName}>{selectedFlyer.businessName}</Text>
             
-            {selectedFlyer.averageRating && selectedFlyer.averageRating > 0 && (
+            {selectedFlyer.averageRating !== undefined && selectedFlyer.averageRating > 0 && (
               <View style={styles.ratingContainer}>
                 <Star size={14} color="#FFD700" fill="#FFD700" />
                 <Text style={styles.ratingText}>{selectedFlyer.averageRating}</Text>
@@ -261,7 +315,7 @@ export default function MapScreen() {
             <View style={styles.flyerLocation}>
               <MapPin size={14} color="#fff" />
               <Text style={styles.flyerLocationText} numberOfLines={1}>
-                {selectedFlyer.location.address}
+                {selectedFlyer.location.address || 'Location N/A'}
                 {selectedFlyer.distance && ` (${selectedFlyer.distance} km away)`}
               </Text>
             </View>
@@ -433,6 +487,32 @@ const styles = StyleSheet.create({
   categoryButtonText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  subcategoriesContainer: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: 12,
+  },
+  subcategoriesTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 8,
+  },
+  subcategoriesScrollContent: {
+    paddingBottom: 4,
+  },
+  subcategoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: colors.background,
+    marginRight: 8,
+  },
+  subcategoryButtonText: {
+    fontSize: 12,
+    color: colors.text,
   },
   selectedFlyerCard: {
     position: 'absolute',

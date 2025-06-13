@@ -14,7 +14,7 @@ import CreateFlyerButton from '@/components/CreateFlyerButton';
 import EmptyState from '@/components/EmptyState';
 import TrendingFlyerCard from '@/components/TrendingFlyerCard';
 import * as Haptics from 'expo-haptics';
-import { Compass, MessageCircle } from 'lucide-react-native';
+import { Compass, MessageCircle, Cricket } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
@@ -155,12 +155,8 @@ export default function DiscoverScreen() {
               {trendingFlyers.length > 0 && !selectedCategory && (
                 <View style={styles.trendingSection}>
                   <Text style={styles.trendingSectionTitle}>Trending Now</Text>
-                  <ScrollView 
-                    horizontal 
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.trendingScrollContent}
-                  >
-                    {trendingFlyers.map((flyer) => (
+                  <View style={styles.trendingGrid}>
+                    {trendingFlyers.slice(0, 3).map((flyer) => (
                       <View key={flyer.id} style={styles.trendingItem}>
                         <TrendingFlyerCard 
                           flyer={flyer} 
@@ -168,7 +164,7 @@ export default function DiscoverScreen() {
                         />
                       </View>
                     ))}
-                  </ScrollView>
+                  </View>
                 </View>
               )}
               
@@ -202,6 +198,29 @@ export default function DiscoverScreen() {
                 <Text style={styles.locationHint}>
                   Showing results near your location
                 </Text>
+              )}
+              
+              {selectedCategory === 'sports' && (
+                <View style={styles.sportsHighlight}>
+                  <View style={styles.sportsImageContainer}>
+                    <View style={styles.sportsImageOverlay} />
+                    <Text style={styles.sportsHighlightText}>Cricket, Badminton, Tennis & More</Text>
+                  </View>
+                  <View style={styles.sportsCategories}>
+                    <TouchableOpacity style={styles.sportsCategoryButton}>
+                      <Text style={styles.sportsCategoryText}>Cricket</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.sportsCategoryButton}>
+                      <Text style={styles.sportsCategoryText}>Badminton</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.sportsCategoryButton}>
+                      <Text style={styles.sportsCategoryText}>Tennis</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.sportsCategoryButton}>
+                      <Text style={styles.sportsCategoryText}>Volleyball</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
               )}
             </View>
           }
@@ -310,11 +329,60 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: 12,
   },
-  trendingScrollContent: {
-    paddingLeft: 4,
-    paddingRight: 16,
+  trendingGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
   },
   trendingItem: {
-    marginRight: 12,
+    width: '32%',
+    marginBottom: 12,
+  },
+  sportsHighlight: {
+    marginVertical: 16,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: colors.card,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  sportsImageContainer: {
+    height: 120,
+    backgroundColor: colors.categories.sports,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  sportsImageOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+  },
+  sportsHighlightText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    zIndex: 1,
+  },
+  sportsCategories: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    padding: 12,
+  },
+  sportsCategoryButton: {
+    backgroundColor: `${colors.categories.sports}15`,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+  },
+  sportsCategoryText: {
+    color: colors.categories.sports,
+    fontWeight: '600',
+    fontSize: 12,
   },
 });

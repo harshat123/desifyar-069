@@ -40,8 +40,14 @@ export default function DatePicker({
     // Set initial date to current value or today
     if (value) {
       const dateObj = new Date(value);
-      setTempDate(dateObj);
-      setCurrentMonth(new Date(dateObj.getFullYear(), dateObj.getMonth(), 1));
+      if (!isNaN(dateObj.getTime())) {
+        setTempDate(dateObj);
+        setCurrentMonth(new Date(dateObj.getFullYear(), dateObj.getMonth(), 1));
+      } else {
+        const today = new Date();
+        setTempDate(today);
+        setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
+      }
     } else {
       const today = new Date();
       setTempDate(today);
@@ -92,12 +98,19 @@ export default function DatePicker({
   const formatDisplayDate = (dateString: string): string => {
     if (!dateString) return '';
     
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return '';
+    }
   };
   
   const getDaysInMonth = (year: number, month: number) => {

@@ -58,7 +58,7 @@ export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardP
           <View style={styles.ratingContainer}>
             <Star size={12} color={colors.secondary} fill={colors.secondary} />
             <Text style={styles.ratingText}>
-              {flyer.averageRating} ({flyer.reviewCount || 0})
+              {flyer.averageRating?.toFixed(1) || '0'} ({flyer.reviewCount || 0})
             </Text>
           </View>
         )}

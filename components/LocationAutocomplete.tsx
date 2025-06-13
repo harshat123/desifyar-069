@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, FlatList, ActivityIndicator, Modal, Platform } from 'react-native';
 import { colors } from '@/constants/colors';
 import { MapPin, Search, X } from 'lucide-react-native';
@@ -30,6 +30,13 @@ const mockAddressSuggestions = [
   { id: '22', address: '303 Birch Dr, New York, NY 10003', lat: 40.7128, lng: -74.0060 },
   { id: '23', address: '404 Elm St, Houston, TX 77001', lat: 29.7604, lng: -95.3698 },
   { id: '24', address: '505 Willow Ave, Houston, TX 77002', lat: 29.7604, lng: -95.3698 },
+  // Add more Indian locations
+  { id: '25', address: '123 MG Road, Bangalore, Karnataka 560001', lat: 12.9716, lng: 77.5946 },
+  { id: '26', address: '456 Linking Road, Mumbai, Maharashtra 400050', lat: 19.0760, lng: 72.8777 },
+  { id: '27', address: '789 Connaught Place, New Delhi, Delhi 110001', lat: 28.6139, lng: 77.2090 },
+  { id: '28', address: '101 Park Street, Kolkata, West Bengal 700016', lat: 22.5726, lng: 88.3639 },
+  { id: '29', address: '202 Anna Salai, Chennai, Tamil Nadu 600002', lat: 13.0827, lng: 80.2707 },
+  { id: '30', address: '303 Jubilee Hills, Hyderabad, Telangana 500033', lat: 17.4065, lng: 78.4772 },
 ];
 
 interface LocationAutocompleteProps {
@@ -57,6 +64,7 @@ export default function LocationAutocomplete({
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   useEffect(() => {
     // Update query when value changes from outside
@@ -66,17 +74,33 @@ export default function LocationAutocomplete({
   }, [value]);
   
   useEffect(() => {
+    // Clear previous timeout if it exists
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     if (query.trim().length > 2) {
-      searchAddresses(query);
+      // Set a small delay to avoid too many searches while typing
+      setLoading(true);
+      searchTimeoutRef.current = setTimeout(() => {
+        searchAddresses(query);
+      }, 300);
     } else {
       setSuggestions([]);
+      setLoading(false);
     }
+    
+    // Cleanup function
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
   }, [query]);
   
   const searchAddresses = (searchQuery: string) => {
     // In a real app, this would be an API call to a geocoding service
     // For this demo, we'll use mock data with a simulated delay
-    setLoading(true);
     
     setTimeout(() => {
       const filtered = mockAddressSuggestions.filter(
@@ -105,7 +129,7 @@ export default function LocationAutocomplete({
   
   const handleClearInput = () => {
     setQuery('');
-    onChange('');
+    onChange('', undefined, undefined);
     setSuggestions([]);
   };
   
@@ -124,7 +148,7 @@ export default function LocationAutocomplete({
   const handleChangeText = (text: string) => {
     setQuery(text);
     if (text.trim().length === 0) {
-      onChange('');
+      onChange('', undefined, undefined);
     }
   };
   
