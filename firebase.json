@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "expo export --platform web",
+    "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
