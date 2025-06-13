@@ -34,12 +34,9 @@ Follow these steps to deploy your Flyer App to Firebase Hosting:
 
 2. Deploy to Firebase:
    ```
-   firebase deploy --only hosting
-   ```
-   Or use the shortcut command:
-   ```
    npm run deploy
    ```
+   This will deploy your app to Firebase Hosting.
 
 3. After successful deployment, Firebase will provide a URL where your app is hosted.
 
