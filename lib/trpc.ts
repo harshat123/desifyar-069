@@ -2,6 +2,7 @@ import { createTRPCReact } from "@trpc/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import type { AppRouter } from "@/backend/trpc/app-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from 'react';
 
 // Create a new query client instance
 export const queryClient = new QueryClient();
@@ -20,7 +21,7 @@ export const trpcClient = createTRPCClient<AppRouter>({
 
 // Provider component for wrapping your app
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const trpcClient = trpc.createClient({
+  const client = trpc.createClient({
     links: [
       httpBatchLink({
         url: "/api/trpc",
@@ -29,7 +30,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
   });
 
   return (
-    <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    <trpc.Provider client={client} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </trpc.Provider>
   );

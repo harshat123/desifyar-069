@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flyer App</title>
-  <meta name="description" content="Discover authentic Indian stores and offers">
+  <title>Flyer App - Discover Local Offers</title>
+  <meta name="description" content="Discover authentic Indian stores and offers near you">
   <link rel="icon" href="/favicon.png">
   <style>
     body {
@@ -19,13 +19,28 @@
     }
     .loading-container {
       text-align: center;
+      padding: 20px;
+      max-width: 400px;
+    }
+    .loading-logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+      border-radius: 20px;
+      background-color: #5271ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
     }
     .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(0, 0, 0, 0.1);
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(82, 113, 255, 0.2);
       border-radius: 50%;
-      border-top-color: #3498db;
+      border-top-color: #5271ff;
       animation: spin 1s ease-in-out infinite;
       margin: 0 auto 20px;
     }
@@ -35,14 +50,22 @@
     .loading-text {
       font-size: 18px;
       color: #333;
+      margin-bottom: 10px;
+    }
+    .loading-subtext {
+      font-size: 14px;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <div id="root">
     <div class="loading-container">
+      <div class="loading-logo">F</div>
+      <h1 class="loading-text">Flyer App</h1>
+      <p class="loading-subtext">Discover authentic Indian stores and offers near you</p>
       <div class="loading-spinner"></div>
-      <p class="loading-text">Loading Flyer App...</p>
+      <p class="loading-subtext">Loading your personalized experience...</p>
     </div>
   </div>
 </body>

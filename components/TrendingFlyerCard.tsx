@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { Flyer } from '@/types';
 import { colors } from '@/constants/colors';
-import { Star, MapPin } from 'lucide-react-native';
+import { Tag, TrendingUp, Star } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 
 interface TrendingFlyerCardProps {
   flyer: Flyer;
@@ -11,56 +12,53 @@ interface TrendingFlyerCardProps {
 }
 
 const { width } = Dimensions.get('window');
-// Adjust card width to prevent overlapping
-const CARD_WIDTH = Math.min(width * 0.32, 160);
 
 export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardProps) {
   const handlePress = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
     onPress(flyer);
   };
   
   return (
     <TouchableOpacity 
-      style={styles.container}
+      style={styles.container} 
       onPress={handlePress}
-      activeOpacity={0.8}
+      activeOpacity={0.9}
     >
       <Image
         source={{ uri: flyer.imageUrl }}
         style={styles.image}
         contentFit="cover"
+        transition={300}
       />
+      
+      <View style={styles.overlay} />
+      
+      <View style={styles.trendingBadge}>
+        <TrendingUp size={14} color="#fff" />
+        <Text style={styles.trendingText}>Trending</Text>
+      </View>
       
       {flyer.discount && (
         <View style={styles.discountBadge}>
+          <Tag size={14} color="#fff" />
           <Text style={styles.discountText}>{flyer.discount}</Text>
         </View>
       )}
       
       <View style={styles.content}>
-        <Text style={styles.title} numberOfLines={1}>
-          {flyer.title}
-        </Text>
+        <Text style={styles.title} numberOfLines={1}>{flyer.title}</Text>
+        <Text style={styles.businessName} numberOfLines={1}>{flyer.businessName}</Text>
         
-        <Text style={styles.businessName} numberOfLines={1}>
-          {flyer.businessName}
-        </Text>
-        
-        <View style={styles.locationContainer}>
-          <MapPin size={12} color={colors.textSecondary} />
-          <Text style={styles.locationText} numberOfLines={1}>
-            {flyer.location && flyer.location.address 
-              ? flyer.location.address.split(',')[0] 
-              : 'Location N/A'}
-          </Text>
-        </View>
-        
-        {flyer.averageRating !== undefined && flyer.averageRating > 0 && (
+        {flyer.averageRating && flyer.averageRating > 0 && (
           <View style={styles.ratingContainer}>
-            <Star size={12} color={colors.secondary} fill={colors.secondary} />
-            <Text style={styles.ratingText}>
-              {flyer.averageRating?.toFixed(1) || '0'} ({flyer.reviewCount || 0})
-            </Text>
+            <Star size={16} color="#FFD700" fill="#FFD700" />
+            <Text style={styles.ratingText}>{flyer.averageRating}</Text>
+            {flyer.reviewCount && (
+              <Text style={styles.reviewCountText}>({flyer.reviewCount})</Text>
+            )}
           </View>
         )}
       </View>
@@ -70,68 +68,107 @@ export default function TrendingFlyerCard({ flyer, onPress }: TrendingFlyerCardP
 
 const styles = StyleSheet.create({
   container: {
-    width: CARD_WIDTH,
-    borderRadius: 12,
-    backgroundColor: colors.card,
+    width: width * 0.75,
+    maxWidth: 320,
+    height: 180,
+    borderRadius: 16,
     overflow: 'hidden',
+    marginRight: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    marginRight: 12, // Add explicit margin to prevent overlapping
   },
   image: {
     width: '100%',
-    height: CARD_WIDTH,
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    height: '100%',
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 16,
+  },
+  trendingBadge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: colors.accent,
+  },
+  trendingText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#fff',
+    marginLeft: 4,
   },
   discountBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: colors.secondary,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  discountText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  content: {
-    padding: 8,
-  },
-  title: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 2,
-  },
-  businessName: {
-    fontSize: 10,
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  locationContainer: {
+    top: 12,
+    left: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: colors.secondary,
   },
-  locationText: {
-    fontSize: 9,
-    color: colors.textSecondary,
-    marginLeft: 2,
+  discountText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#fff',
+    marginLeft: 4,
+  },
+  content: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  businessName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#fff',
+    marginBottom: 4,
+    opacity: 0.9,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   ratingText: {
-    fontSize: 9,
-    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+    marginLeft: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  reviewCountText: {
+    fontSize: 12,
+    color: '#fff',
+    opacity: 0.8,
     marginLeft: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
 });

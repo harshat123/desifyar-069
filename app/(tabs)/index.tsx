@@ -159,6 +159,9 @@ export default function DiscoverScreen() {
                     horizontal 
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={styles.trendingScrollContent}
+                    decelerationRate="fast"
+                    snapToInterval={width * 0.75 + 12}
+                    snapToAlignment="start"
                   >
                     {trendingFlyers.slice(0, 6).map((flyer) => (
                       <View key={flyer.id} style={styles.trendingItem}>
@@ -341,7 +344,9 @@ const styles = StyleSheet.create({
     paddingRight: 16,
   },
   trendingItem: {
-    marginRight: 12, // This is now redundant as we added margin to the card itself
+    marginRight: 12,
+    width: width * 0.75, // Fixed width for each trending item
+    maxWidth: 320, // Maximum width on larger screens
   },
   sportsHighlight: {
     marginVertical: 16,

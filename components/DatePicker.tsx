@@ -54,7 +54,9 @@ export default function DatePicker({
       setCurrentMonth(new Date(today.getFullYear(), today.getMonth(), 1));
     }
     
-    if (Platform.OS === 'ios' || Platform.OS === 'android') {
+    if (Platform.OS === 'ios') {
+      setShowPicker(true);
+    } else if (Platform.OS === 'android') {
       setShowPicker(true);
     } else {
       setShowCalendarModal(true);
