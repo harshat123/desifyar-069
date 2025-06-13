@@ -1,19 +1,48 @@
-import React from 'react';
-import { Stack } from 'expo-router';
 import { TRPCProvider } from '@/lib/trpc';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
+import { useEffect } from 'react';
+
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from 'expo-router';
+
+// Prevent the splash screen from auto-hiding before asset loading is complete.
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    ...FontAwesome.font,
+  });
+
+  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
+
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return <RootLayoutNav />;
+}
+
+function RootLayoutNav() {
   return (
     <TRPCProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="flyer/[id]" options={{ title: 'Flyer Details' }} />
-        <Stack.Screen name="create-flyer" options={{ title: 'Create Flyer' }} />
-        <Stack.Screen name="subscription" options={{ title: 'Subscription' }} />
-        <Stack.Screen name="payment-history" options={{ title: 'Payment History' }} />
-        <Stack.Screen name="redeem-coupon" options={{ title: 'Redeem Coupon' }} />
-        <Stack.Screen name="map" options={{ title: 'Map View' }} />
       </Stack>
     </TRPCProvider>
   );
