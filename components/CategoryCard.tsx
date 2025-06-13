@@ -1,9 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View, Platform, ImageBackground } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { Category } from '@/types';
 import { colors } from '@/constants/colors';
-import { ShoppingCart, Utensils, Calendar, Store, Trophy } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import { ShoppingCart, Utensils, Calendar, Store, Trophy } from "lucide-react";
 import { LinearGradient } from 'expo-linear-gradient';
 
 interface CategoryCardProps {
@@ -68,9 +67,6 @@ export default function CategoryCard({ category, onPress, isSelected }: Category
   const categoryImage = getCategoryImage(category);
   
   const handlePress = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
     onPress(category);
   };
   

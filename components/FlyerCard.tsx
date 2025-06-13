@@ -1,10 +1,9 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Platform } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import { Image } from 'expo-image';
 import { Flyer } from '@/types';
 import { colors } from '@/constants/colors';
-import { Eye, Heart, Tag, Clock, MapPin, TrendingUp, Star } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
+import { Eye, Heart, Tag, Clock, MapPin, TrendingUp, Star } from "lucide-react";
 
 interface FlyerCardProps {
   flyer: Flyer;
@@ -19,9 +18,6 @@ export default function FlyerCard({ flyer, onPress }: FlyerCardProps) {
   const categoryColor = colors.categories[flyer.category];
   
   const handlePress = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     onPress(flyer);
   };
   

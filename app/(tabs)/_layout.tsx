@@ -1,9 +1,8 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import { colors } from "@/constants/colors";
-import { Home, Search, User, Bell, MapPin } from "lucide-react-native";
-import { Text, StyleSheet, View, Platform } from "react-native";
-import { BlurView } from "expo-blur";
+import { Home, Search, User, Bell, MapPin } from "lucide-react";
+import { Text, View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 
 export default function TabLayout() {
@@ -18,7 +17,7 @@ export default function TabLayout() {
           elevation: 0,
           shadowOpacity: 0,
           height: 60,
-          paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+          paddingBottom: 10,
           paddingTop: 10,
         },
         headerStyle: {
@@ -34,15 +33,6 @@ export default function TabLayout() {
           fontSize: 12,
           fontWeight: '500',
         },
-        tabBarBackground: () => (
-          Platform.OS === 'ios' ? (
-            <BlurView
-              tint="light"
-              intensity={80}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : null
-        ),
       }}
     >
       <Tabs.Screen

@@ -31,6 +31,7 @@
         "expo-web-browser": "~14.1.6",
         "firebase-tools": "^14.7.0",
         "hono": "^4.7.11",
+        "lucide-react": "0.294.0",
         "lucide-react-native": "0.294.0",
         "nativewind": "^4.1.23",
         "react": "19.0.0",
@@ -1419,6 +1420,8 @@
     "lru-cache": ["lru-cache@5.1.1", "", { "dependencies": { "yallist": "^3.0.2" } }, "sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w=="],
 
     "lsofi": ["lsofi@1.0.0", "", { "dependencies": { "is-number": "^2.1.0", "through2": "^2.0.1" } }, "sha512-MKr9vM1MSm+TSKfI05IYxpKV1NCxpJaBLnELyIf784zYJ5KV9lGCE1EvpA2DtXDNM3fCuFeCwXUzim/fyQRi+A=="],
+
+    "lucide-react": ["lucide-react@0.294.0", "", { "peerDependencies": { "react": "^16.5.1 || ^17.0.0 || ^18.0.0" } }, "sha512-V7o0/VECSGbLHn3/1O67FUgBwWB+hmzshrgDVRJQhMh8uj5D3HBuIvhuAmQTtlupILSplwIZg5FTc4tTKMA2SA=="],
 
     "lucide-react-native": ["lucide-react-native@0.294.0", "", { "peerDependencies": { "prop-types": "^15.7.2", "react": "^16.5.1 || ^17.0.0 || ^18.0.0", "react-native": "*", "react-native-svg": "^12.0.0 || ^13.0.0" } }, "sha512-0YB2WWtjQg/M2BEzHX1RJ4mHGPhET6MnS57QzfvMlIUXRTQkTU2f6zIv/TSFGQafCZOmP1Z/14fE54wvrAt4Dw=="],
 

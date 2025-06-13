@@ -37,6 +37,7 @@
     "expo-web-browser": "~14.1.6",
     "firebase-tools": "^14.7.0",
     "hono": "^4.7.11",
+    "lucide-react": "0.294.0",
     "lucide-react-native": "0.294.0",
     "nativewind": "^4.1.23",
     "react": "19.0.0",

@@ -21,13 +21,15 @@ export const trpcClient = createTRPCClient<AppRouter>({
 
 // Provider component for wrapping your app
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const client = trpc.createClient({
-    links: [
-      httpBatchLink({
-        url: "/api/trpc",
-      }),
-    ],
-  });
+  const [client] = React.useState(() => 
+    trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: "/api/trpc",
+        }),
+      ],
+    })
+  );
 
   return (
     <trpc.Provider client={client} queryClient={queryClient}>

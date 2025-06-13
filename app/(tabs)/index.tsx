@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, View, FlatList, ScrollView, Text, Animated, Platform, TouchableOpacity, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View, FlatList, ScrollView, Text, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Category, Flyer } from '@/types';
@@ -13,8 +12,7 @@ import LocationBar from '@/components/LocationBar';
 import CreateFlyerButton from '@/components/CreateFlyerButton';
 import EmptyState from '@/components/EmptyState';
 import TrendingFlyerCard from '@/components/TrendingFlyerCard';
-import * as Haptics from 'expo-haptics';
-import { Compass, MessageCircle } from 'lucide-react-native';
+import { Compass, MessageCircle } from "lucide-react";
 
 const { width } = Dimensions.get('window');
 const categories: Category[] = ['groceries', 'restaurants', 'events', 'markets', 'sports'];
@@ -37,30 +35,18 @@ export default function DiscoverScreen() {
   
   const handleCategoryPress = (category: Category) => {
     // Toggle category selection
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
     setSelectedCategory(selectedCategory === category ? null : category);
   };
   
   const handleFlyerPress = (flyer: Flyer) => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     router.push(`/flyer/${flyer.id}`);
   };
   
   const handleViewMap = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     router.push('/map');
   };
   
   const handleContactTeam = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
     // In a real app, this would navigate to a messaging screen
     router.push('/redeem-coupon'); // Temporary navigation to an existing screen
   };
@@ -108,7 +94,7 @@ export default function DiscoverScreen() {
   );
   
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <View style={styles.container}>
       <StatusBar style="dark" />
       
       <LocationBar />
@@ -237,7 +223,7 @@ export default function DiscoverScreen() {
       )}
       
       <CreateFlyerButton />
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -367,7 +353,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   sportsImageOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0,0,0,0.3)',
   },
   sportsHighlightText: {

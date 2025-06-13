@@ -1,10 +1,9 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View, Text, Platform, Animated } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, Text, Animated } from 'react-native';
 import { colors } from '@/constants/colors';
-import { Plus } from 'lucide-react-native';
+import { Plus } from "lucide-react";
 import { useUserStore } from '@/store/useUserStore';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 
 export default function CreateFlyerButton() {
   const { flyersPosted, isPremium } = useUserStore();
@@ -34,10 +33,6 @@ export default function CreateFlyerButton() {
   });
   
   const handlePress = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }
-    
     if (flyersPosted >= 5 && !isPremium) {
       // Navigate to subscription screen
       router.push('/subscription');

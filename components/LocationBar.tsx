@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, TextInput, Modal, FlatList, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, Modal, FlatList, ActivityIndicator } from 'react-native';
 import { useLocationStore } from '@/store/useLocationStore';
 import { colors } from '@/constants/colors';
 import { popularCities, states, City } from '@/constants/cities';
-import { MapPin, RefreshCw, Search, X, ChevronDown } from 'lucide-react-native';
-import * as Location from 'expo-location';
-import * as Haptics from 'expo-haptics';
+import { MapPin, RefreshCw, Search, X, ChevronDown } from "lucide-react";
 
 export default function LocationBar() {
   const { latitude, longitude, address, setLocation } = useLocationStore();
@@ -22,50 +20,31 @@ export default function LocationBar() {
     setLoading(true);
     setError(null);
     
-    if (Platform.OS !== 'web') {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    
     try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      
-      if (status !== 'granted') {
-        setError('Permission to access location was denied');
+      // For web, we'll use the browser's geolocation API
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            // In a real app, you would use a reverse geocoding service here
+            // For now, we'll just set a generic address
+            setLocation(latitude, longitude, "Current Location");
+            setLoading(false);
+          },
+          (err) => {
+            setError("Could not fetch location");
+            console.error(err);
+            setLoading(false);
+          }
+        );
+      } else {
+        setError("Geolocation is not supported by this browser");
         setLoading(false);
-        return;
       }
-      
-      const location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      
-      // Get address from coordinates
-      const [addressResponse] = await Location.reverseGeocodeAsync({
-        latitude,
-        longitude
-      });
-      
-      let formattedAddress = 'Current Location';
-      if (addressResponse) {
-        const { city, region, postalCode } = addressResponse;
-        if (city && region) {
-          formattedAddress = `${city}, ${region}`;
-        } else if (city) {
-          formattedAddress = city;
-        } else if (region) {
-          formattedAddress = region;
-        }
-        
-        // Add postal code if available
-        if (postalCode) {
-          formattedAddress += ` (${postalCode})`;
-        }
-      }
-      
-      setLocation(latitude, longitude, formattedAddress);
     } catch (err) {
       setError('Could not fetch location');
       console.error(err);
-    } finally {
       setLoading(false);
     }
   };
@@ -108,10 +87,6 @@ export default function LocationBar() {
   };
 
   const selectCity = (city: City) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
-    
     setLocation(city.latitude, city.longitude, `${city.name}, ${city.state}`);
     setShowCitySearch(false);
     setSearchQuery('');
@@ -119,10 +94,6 @@ export default function LocationBar() {
   };
   
   const handleStateSelect = (state: string) => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
-    
     if (selectedState === state) {
       setSelectedState(null);
     } else {
@@ -141,10 +112,6 @@ export default function LocationBar() {
   };
   
   const toggleSearchMode = () => {
-    if (Platform.OS !== 'web') {
-      Haptics.selectionAsync();
-    }
-    
     setSearchByZipcode(!searchByZipcode);
     setSearchQuery('');
     setFilteredCities(popularCities);
@@ -156,9 +123,6 @@ export default function LocationBar() {
         style={styles.locationContainer}
         onPress={() => {
           setShowCitySearch(true);
-          if (Platform.OS !== 'web') {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }
         }}
       >
         <MapPin size={18} color={colors.primary} />
