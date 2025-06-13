@@ -1,6 +1,6 @@
 # Firebase Deployment Instructions
 
-This document provides step-by-step instructions for deploying the Flyer App to Firebase Hosting.
+Follow these steps to deploy your Flyer App to Firebase Hosting:
 
 ## Prerequisites
 
@@ -9,48 +9,50 @@ This document provides step-by-step instructions for deploying the Flyer App to 
    npm install -g firebase-tools
    ```
 
-2. Make sure you're logged in to Firebase:
+2. Login to Firebase:
    ```
    firebase login
    ```
 
-3. If you haven't initialized Firebase in your project yet:
+3. Initialize Firebase in your project (if not already done):
    ```
    firebase init
    ```
    - Select "Hosting" when prompted
    - Select your Firebase project or create a new one
-   - Use "web-build" as your public directory
+   - Specify "web-build" as your public directory
    - Configure as a single-page app: Yes
    - Set up automatic builds and deploys with GitHub: No (unless you want to)
 
 ## Deployment Steps
 
-1. Build your Expo web app:
+1. Build your web application:
    ```
    npm run build
    ```
-   This will create a `web-build` directory with your compiled web app.
+   This will create a `web-build` directory with your compiled app.
 
-2. Deploy to Firebase Hosting:
+2. Deploy to Firebase:
+   ```
+   firebase deploy --only hosting
+   ```
+   Or use the shortcut command:
    ```
    npm run deploy
    ```
-   Or you can run both commands in sequence:
-   ```
-   npm run build-and-deploy
-   ```
 
-3. After deployment completes, Firebase will provide a URL where your app is hosted.
+3. After successful deployment, Firebase will provide a URL where your app is hosted.
 
 ## Troubleshooting
 
-- If you encounter any issues with React version compatibility, check the package.json file. The app is configured to use React 18.2.0 to be compatible with all dependencies.
+- If you encounter any issues with the index.html file, make sure the file in `public/index.html` is correctly formatted and has the proper content for your Flyer App.
+- The `firebase.json` file should be configured to handle routing for a single-page application.
+- Make sure your web-build directory is generated correctly before deploying.
 
-- If you see 404 errors after deployment, make sure your Firebase hosting configuration has the correct rewrite rules (they should be set up in firebase.json).
+## Important Notes
 
-- For any other issues, check the Firebase Hosting documentation or run:
-  ```
-  firebase deploy --debug
-  ```
-  to get more detailed error information.
+- The Firebase hosting configuration in `firebase.json` includes cache control settings:
+  - No caching for HTML files to ensure users always get the latest version
+  - 1 week caching for static assets (images, CSS, JS) for better performance
+
+- Remember that Firebase Hosting is for the web version of your app only. For native mobile deployment, you'll need to use EAS Build or another mobile app distribution service.
