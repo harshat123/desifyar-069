@@ -12,6 +12,29 @@ import DatePicker from '@/components/DatePicker';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { mockFirebaseServices } from './firebase-config';
 import { trpc, trpcClient } from '@/lib/trpc';
+import { TRPCClientError } from '@trpc/client';
+
+// Define the type for the flyer data returned from the mutation
+interface FlyerData {
+  id: string;
+  title: string;
+  businessName: string;
+  description: string;
+  category: Category;
+  imageUrl: string;
+  location: {
+    address: string;
+    latitude?: number;
+    longitude?: number;
+  };
+  expiresAt: string;
+  createdAt: string;
+  views: number;
+  reactions: number;
+  userId: string;
+  discount?: string;
+  couponCode?: string;
+}
 
 export default function CreateFlyerScreen() {
   const { 
@@ -45,7 +68,7 @@ export default function CreateFlyerScreen() {
   
   // tRPC mutation for creating a flyer
   const createFlyerMutation = trpc.flyers.create.useMutation({
-    onSuccess: (data) => {
+    onSuccess: (data: FlyerData) => {
       console.log("Flyer created successfully:", data);
       
       // Add business name to user's list if it's a new business
@@ -67,7 +90,7 @@ export default function CreateFlyerScreen() {
       
       setIsSubmitting(false);
     },
-    onError: (error) => {
+    onError: (error: TRPCClientError<any>) => {
       console.error("Error creating flyer:", error);
       Alert.alert(
         "Error",
