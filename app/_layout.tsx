@@ -12,7 +12,6 @@ export {
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  // We're removing the font loading since the font file doesn't exist
   useEffect(() => {
     // Hide splash screen after a short delay
     const hideSplash = async () => {
